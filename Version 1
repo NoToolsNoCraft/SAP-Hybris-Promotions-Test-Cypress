@@ -1,0 +1,356 @@
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // Returning false here prevents Cypress from failing the test
+    return false;
+  });
+  
+  describe('Promotions test', () => {
+    it('Check if all Promotions are properly set up', () => {
+        // Visit the login page before each test
+        cy.visit('https://backoffice.stg.iqos.com/backoffice/login.zul', { failOnStatusCode: false }).wait(1000);
+  
+        // Log in to the application
+        cy.get('input[placeholder="Enter user name"]:visible').type("ADD YOUR USERNAME HERE", { force: true }).wait(300);
+        cy.get('input[placeholder="Enter password"]:visible').type("ADD YOUR PASSWORD HERE", { force: true });
+        cy.get('.login_btn').click({ force: true }).wait(30000);
+  
+        // Select "Promotion Editor" role
+        cy.get('.z-listcell-content')
+            .contains('Promotion Editor')
+            .should('exist')
+            .click({ force: true })
+            .wait(2000);
+  
+        // Click on the Proceed button
+        cy.get('.yw-selector-btn')
+            .contains('PROCEED')
+            .should('exist')
+            .click({ force: true })
+            .wait(15000);
+  
+        // Select "Marketing" from the menu
+        cy.get('.yw-navigationNode-level1')
+            .contains('Marketing')
+            .should('exist')
+            .click({ force: true })
+            .wait(1000);
+  
+        // Select "Promotion Rules" inside of the Marketing section
+        cy.get('span.z-label')
+            .contains('Promotion Rules')
+            .should('exist')
+            .click({ force: true })
+            .wait(5000);
+
+
+
+
+//=============================================================================================  
+//Test Promotion 1
+
+        // Type text into the input field
+        cy.get('.z-bandbox-input')
+            .eq(6)
+            .should('exist')
+            .type('PMI_MGM_Godfather_Discount', { force: true })
+            .wait(300);
+  
+        // Click on the search button
+        cy.get('.yw-textsearch-searchbutton.z-button')
+            .eq(1)
+            .click({ force: true })
+            .wait(10000);
+  
+        // Define the promotion details
+const promotionCode = 'CR_PMI_MGM_Godfather_Discount_01_More';
+const promotionName = 'MGM GODFATHER Reward';
+const websiteEnv = 'Costa Rica_Promotion_Group';
+const promotionVersion = '4'; // This can be '1', '2', '3', etc.
+
+
+// Log each criterion individually
+cy.log(`Promotion Code: ${promotionCode}`);
+cy.log(`Promotion Name: ${promotionName}`);
+cy.log(`Website Environment: ${websiteEnv}`);
+cy.log(`Promotion Version: ${promotionVersion}`);
+
+// Function to search for the promotion
+function searchPromotion1() {
+    // Construct a selector that matches all the criteria
+    const selector = `tr.yw-coll-browser-hyperlink:has(.yw-listview-cell-label.z-label:contains("${promotionCode}")):has(.yw-listview-cell-label.z-label:contains("${promotionName}")):has(.yw-listview-cell-label.z-label:contains("${websiteEnv}")):has(.yw-listview-cell-label.z-label:contains("${promotionVersion}"))`;
+    // Recursive function to check each page
+    function checkPage() {
+        cy.get('body').then($body => {
+            if ($body.find(selector).length > 0) {
+                // If the promotion is found, click on the promotionVersion element inside it
+                cy.get(selector).within(() => {
+                    cy.get(`.yw-listview-cell-label.z-label:contains("${promotionVersion}")`).click({ force: true }).wait(10000);
+                });
+            } else {
+                // If the promotion is not found, check if the next page button is enabled and visible
+                cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                    // Add debugging information
+                    cy.log('Button found:', $button.length > 0 ? 'Yes' : 'No');
+                    cy.log('Button visibility:', $button.is(':visible') ? 'Visible' : 'Not Visible');
+                    cy.log('Button disabled attribute:', $button.attr('disabled') ? 'Disabled' : 'Enabled');
+                    
+                    if ($button.is(':visible') && !$button.attr('Enabled')) {
+                        cy.log('Clicking the next page button');
+                        // Click the next page button and recursively search for the promotion
+                        cy.wrap($button).click({ force: true }).wait(5000); // Adjust wait time if needed
+                        checkPage();
+                    } else {
+                        // If the next page button is disabled or not visible, the promotion is not found
+                        cy.log('Promotion not found or next page button is not clickable');
+                    }
+                });
+            }
+        });
+    }
+
+    // Start the search
+    checkPage();
+}
+
+// Call the function to start the search
+searchPromotion1();
+
+    // Click on Rule Properties
+    cy.get('.z-tab-content').contains('Rule Properties').scrollIntoView().click({ force: true });
+
+    // Check the Deployments section for the necessary value
+    cy.get('.ye-default-reference-editor-selected-item-label.ye-editor-disabled.z-label')
+        .should('contain.text', 'promotion-cr-module(hybris-rules:promotion-cr:1.0.0)');
+
+    // Click on Conditions & Actions tab
+    cy.get('.yw-editorarea-tablabel.z-label').contains('Conditions & Actions').click();
+
+    // Check the Conditions section
+    cy.get('.z-html').should('contain.text', 'CONTAINS ANY');
+    cy.get('.z-html').should('contain.text', '[24150]');
+    cy.get('.z-html').should('contain.text', '[]'); // Customers: N/A
+    cy.get('.z-html').should('contain.text', '[MGM_Referral_1]');
+    cy.get('.z-html').should('contain.text', '{CRC=12000}');
+
+    // Check the Actions section
+    cy.get('.z-html').should('contain.text', '{CRC=8000}');
+
+
+
+//=============================================================================================  
+//Test Promotion 2
+
+        // Type text into the input field
+        cy.get('.z-bandbox-input')
+            .eq(6)
+            .should('exist')
+            .clear()
+            .type('TN_PMI_MGM_Godson_Discount', { force: true })
+            .wait(300);
+  
+        // Click on the search button
+        cy.get('.yw-textsearch-searchbutton.z-button')
+            .eq(1)
+            .click({ force: true })
+            .wait(10000);
+  
+        // Define the promotion details
+const promotionCode2 = 'TN_PMI_MGM_Godson_Discount';
+const promotionName2 = 'Member get member';
+const websiteEnv2 = 'Tunisia_Promotion_Group';
+const promotionVersion2 = '19'; // This can be '1', '2', '3', etc.
+
+
+// Log each criterion individually
+cy.log(`Promotion Code: ${promotionCode2}`);
+cy.log(`Promotion Name: ${promotionName2}`);
+cy.log(`Website Environment: ${websiteEnv2}`);
+cy.log(`Promotion Version: ${promotionVersion2}`);
+
+// Function to search for the promotion
+function searchPromotion2() {
+    // Construct a selector that matches all the criteria
+    const selector2 = `tr.yw-coll-browser-hyperlink:has(.yw-listview-cell-label.z-label:contains("${promotionCode2}")):has(.yw-listview-cell-label.z-label:contains("${promotionName2}")):has(.yw-listview-cell-label.z-label:contains("${websiteEnv2}")):has(.yw-listview-cell-label.z-label:contains("${promotionVersion2}"))`;
+    // Recursive function to check each page
+    function checkPage() {
+        cy.get('body').then($body => {
+            if ($body.find(selector2).length > 0) {
+                // If the promotion is found, click on the promotionVersion element inside it
+                cy.get(selector2).within(() => {
+                    cy.get(`.yw-listview-cell-label.z-label:contains("${promotionVersion2}")`).click({ force: true }).wait(10000);
+                });
+            } else {
+                // If the promotion is not found, check if the next page button is enabled and visible
+                cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                    // Add debugging information
+                    cy.log('Button found:', $button.length > 0 ? 'Yes' : 'No');
+                    cy.log('Button visibility:', $button.is(':visible') ? 'Visible' : 'Not Visible');
+                    cy.log('Button disabled attribute:', $button.attr('disabled') ? 'Disabled' : 'Enabled');
+                    
+                    if ($button.is(':visible') && !$button.attr('Enabled')) {
+                        cy.log('Clicking the next page button');
+                        // Click the next page button and recursively search for the promotion
+                        cy.wrap($button).click({ force: true }).wait(5000); // Adjust wait time if needed
+                        checkPage();
+                    } else {
+                        // If the next page button is disabled or not visible, the promotion is not found
+                        cy.log('Promotion not found or next page button is not clickable');
+                    }
+                });
+            }
+        });
+    }
+
+    // Start the search
+    checkPage();
+}
+
+// Call the function to start the search
+searchPromotion2();
+
+    // Click on Rule Properties
+    cy.get('.z-tab-content').contains('Rule Properties').scrollIntoView().click({ force: true });
+
+    // Check the Deployments section for the necessary value
+    cy.get('.ye-default-reference-editor-selected-item-label.ye-editor-disabled.z-label')
+        .should('contain.text', 'promotion-tn-module(hybris-rules:promotion-tn:1.0.0)');
+
+    // Click on Conditions & Actions tab
+    cy.get('.yw-editorarea-tablabel.z-label').contains('Conditions & Actions').click();
+
+    // Check the Conditions section
+    cy.get('.z-html').should('contain.text', 'CONTAINS ANY');
+    cy.get('.z-html').should('contain.text', '[MGM_godson_group]');
+    cy.get('.z-html').should('contain.text', '[]'); // Customers: N/A
+    cy.get('.z-html').should('contain.text', 'B0000139');
+    cy.get('.z-html').should('contain.text', 'B0000137');
+
+    //Open the Container section. Inside of it open the Qualifying products section.
+    cy.get('.z-label').contains('Container').scrollIntoView().click({ force: true }).wait(500);
+    cy.get('.z-label').contains('Qualifying products').scrollIntoView().click({ force: true }).wait(500);
+    //Check Catalog Version
+    cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+    .contains("Tunisia Product Catalog : Online");
+    //Check Products
+    //Product 1
+    cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+    .contains("B0000139")
+    .should('contain', 'Tunisia Product Catalog : Staged');
+    //Product 2
+    cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+    .contains("B0000137")
+    .should('contain', 'Tunisia Product Catalog : Staged');
+
+
+
+//=============================================================================================  
+//Test Promotion 3
+
+// Type text into the input field
+cy.get('.z-bandbox-input')
+.eq(6)
+.should('exist')
+.clear()
+.type('EGM_Promo', { force: true })
+.wait(300);
+
+// Click on the search button
+cy.get('.yw-textsearch-searchbutton.z-button')
+.eq(1)
+.click({ force: true })
+.wait(10000);
+
+// Define the promotion details
+const promotionCode3 = 'TN_EGM_Promo';
+const promotionName3 = 'Employee Referrals';
+const websiteEnv3 = 'Tunisia_Promotion_Group';
+const promotionVersion3 = '12'; // This can be '1', '2', '3', etc.
+
+// Log each criterion individually
+cy.log(`Promotion Code: ${promotionCode3}`);
+cy.log(`Promotion Name: ${promotionName3}`);
+cy.log(`Website Environment: ${websiteEnv3}`);
+cy.log(`Promotion Version: ${promotionVersion3}`);
+
+// Function to search for the promotion
+function searchPromotion3() {
+    // Construct a selector that matches all the criteria
+    const selector3 = `tr.yw-coll-browser-hyperlink:has(.yw-listview-cell-label.z-label:contains("${promotionCode3}")):has(.yw-listview-cell-label.z-label:contains("${promotionName3}")):has(.yw-listview-cell-label.z-label:contains("${websiteEnv3}")):has(.yw-listview-cell-label.z-label:contains("${promotionVersion3}"))`;
+
+    // Recursive function to check each page
+    function checkPage() {
+        cy.get('body').then($body => {
+            if ($body.find(selector3).length > 0) {
+                // If the promotion is found, click on the promotionVersion element inside it
+                cy.get(selector3).within(() => {
+                    cy.get(`.yw-listview-cell-label.z-label:contains("${promotionVersion3}")`).click({ force: true }).wait(10000);
+                });
+            } else {
+                // If the promotion is not found, check if the next page button is enabled and visible
+                cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                    // Add debugging information
+                    cy.log('Button found:', $button.length > 0 ? 'Yes' : 'No');
+                    cy.log('Button visibility:', $button.is(':visible') ? 'Visible' : 'Not Visible');
+                    cy.log('Button disabled attribute:', $button.attr('disabled') ? 'Disabled' : 'Enabled');
+                    
+                    if ($button.is(':visible') && !$button.attr('Enabled')) {
+                        cy.log('Clicking the next page button');
+                        // Click the next page button and recursively search for the promotion
+                        cy.wrap($button).click({ force: true }).wait(5000); // Adjust wait time if needed
+                        checkPage();
+                    } else {
+                        // If the next page button is disabled or not visible, the promotion is not found
+                        cy.log('Promotion not found or next page button is not clickable');
+                    }
+                });
+            }
+        });
+    }
+
+    // Start the search
+    checkPage();
+}
+
+// Call the function to start the search
+searchPromotion3();
+
+
+// Ensure Cypress waits for the promotion to be found
+cy.wait(10000);
+
+// Click on Rule Properties
+cy.get('.z-tab-content').contains('Rule Properties').scrollIntoView().click({ force: true });
+
+// Check the Deployments section for the necessary value
+cy.get('.ye-default-reference-editor-selected-item-label.ye-editor-disabled.z-label')
+.should('contain.text', 'promotion-tn-module(hybris-rules:promotion-tn:1.0.0)');
+
+// Click on Conditions & Actions tab
+cy.get('.yw-editorarea-tablabel.z-label').contains('Conditions & Actions').click().wait(1000);
+
+// Check the Conditions section
+cy.get('.z-html').should('contain.text', 'Emg Coupon: true');
+cy.get('.z-html').should('contain.text', 'Cart CONTAINS ANY');
+cy.get('.z-html').should('contain.text', 'B0000139');
+cy.get('.z-html').should('contain.text', 'B0000137');
+
+// Open the Container section. Inside of it open the Qualifying products section.
+cy.get('.z-label').contains('Container').scrollIntoView().click({ force: true }).wait(500);
+cy.get('.z-label').contains('Qualifying products').scrollIntoView().click({ force: true }).wait(500);
+
+// Check Catalog Version
+cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+.contains("Tunisia Product Catalog : Online");
+
+// Check Products
+// Product 1
+cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+.contains("B0000139")
+.should('contain', 'Tunisia Product Catalog : Staged');
+// Product 2
+cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+.contains("B0000137")
+.should('contain', 'Tunisia Product Catalog : Staged');
+
+
+  });
+});
