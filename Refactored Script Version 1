@@ -10,10 +10,10 @@ describe('Promotions test', () => {
 
         // Log in to the application
         cy.get('input[placeholder="Enter user name"]:visible')
-            .type("petar.skrbic@contracted.pmi.com", { force: true })
+            .type("YOUR USERNAME/EMAIL HERE", { force: true })
             .wait(300);
         cy.get('input[placeholder="Enter password"]:visible')
-            .type("stg_498756!", { force: true });
+            .type("YOUR PASSWORD HERE", { force: true });
         cy.get('.login_btn').click({ force: true }).wait(30000);
 
         // Select "Promotion Editor" role
