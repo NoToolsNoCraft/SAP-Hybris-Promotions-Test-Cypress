@@ -1,0 +1,223 @@
+Cypress.on('uncaught:exception', (err, runnable) => {
+    // Returning false here prevents Cypress from failing the test
+    return false;
+});
+
+describe('Promotions test', () => {
+    it('Check if all Promotions are properly set up', () => {
+        // Visit the login page before each test
+        cy.visit('https://backoffice.stg.iqos.com/backoffice/login.zul', { failOnStatusCode: false }).wait(1000);
+
+        // Log in to the application
+        cy.get('input[placeholder="Enter user name"]:visible')
+            .type("petar.skrbic@contracted.pmi.com", { force: true })
+            .wait(300);
+        cy.get('input[placeholder="Enter password"]:visible')
+            .type("stg_498756!", { force: true });
+        cy.get('.login_btn').click({ force: true }).wait(30000);
+
+        // Select "Promotion Editor" role
+        cy.get('.z-listcell-content')
+            .contains('Promotion Editor')
+            .should('exist')
+            .click({ force: true })
+            .wait(2000);
+
+        // Click on the Proceed button
+        cy.get('.yw-selector-btn')
+            .contains('PROCEED')
+            .should('exist')
+            .click({ force: true })
+            .wait(15000);
+
+        // Select "Marketing" from the menu
+        cy.get('.yw-navigationNode-level1')
+            .contains('Marketing')
+            .should('exist')
+            .click({ force: true })
+            .wait(3000);
+
+        // Select "Promotion Rules" inside of the Marketing section
+        cy.get('span.z-label')
+            .contains('Promotion Rules')
+            .should('exist')
+            .click({ force: true })
+            .wait(5000);
+
+        // Test Promotion 1
+        cy.get('.z-bandbox-input')
+            .eq(6)
+            .should('exist')
+            .type('PMI_MGM_Godfather_Discount', { force: true })
+            .wait(300);
+
+        cy.get('.yw-textsearch-searchbutton.z-button')
+            .eq(1)
+            .click({ force: true })
+            .wait(10000);
+
+        const promotionCode1 = 'CR_PMI_MGM_Godfather_Discount_01_More';
+        const promotionName1 = 'MGM GODFATHER Reward';
+        const websiteEnv1 = 'Costa Rica_Promotion_Group';
+        const promotionVersion1 = '4';
+
+        cy.log(`Promotion Code: ${promotionCode1}`);
+        cy.log(`Promotion Name: ${promotionName1}`);
+        cy.log(`Website Environment: ${websiteEnv1}`);
+        cy.log(`Promotion Version: ${promotionVersion1}`);
+
+        function searchPromotion1() {
+            const selector1 = `tr.yw-coll-browser-hyperlink:has(.yw-listview-cell-label.z-label:contains("${promotionCode1}")):has(.yw-listview-cell-label.z-label:contains("${promotionName1}")):has(.yw-listview-cell-label.z-label:contains("${websiteEnv1}")):has(.yw-listview-cell-label.z-label:contains("${promotionVersion1}"))`;
+
+            function checkPage1() {
+                cy.get('body').then($body => {
+                    if ($body.find(selector1).length > 0) {
+                        cy.get(selector1).within(() => {
+                            cy.get(`.yw-listview-cell-label.z-label:contains("${promotionVersion1}")`)
+                                .click({ force: true })
+                                .wait(10000);
+                        });
+                    } else {
+                        cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                            cy.log('Button found:', $button.length > 0 ? 'Yes' : 'No');
+                            cy.log('Button visibility:', $button.is(':visible') ? 'Visible' : 'Not Visible');
+                            cy.log('Button disabled attribute:', $button.attr('disabled') ? 'Disabled' : 'Enabled');
+
+                            if ($button.is(':visible') && !$button.attr('disabled')) {
+                                cy.log('Clicking the next page button');
+                                cy.wrap($button).click({ force: true }).wait(5000);
+                                checkPage1();
+                            } else {
+                                cy.log('Promotion not found or next page button is not clickable');
+                            }
+                        });
+                    }
+                });
+            }
+
+            checkPage1();
+        }
+
+        searchPromotion1();
+
+        cy.get('.z-tab-content')
+            .contains('Rule Properties')
+            .scrollIntoView()
+            .click({ force: true });
+
+        cy.get('.ye-default-reference-editor-selected-item-label.ye-editor-disabled.z-label')
+            .should('contain.text', 'promotion-cr-module(hybris-rules:promotion-cr:1.0.0)');
+
+        cy.get('.yw-editorarea-tablabel.z-label')
+            .contains('Conditions & Actions')
+            .click();
+
+        cy.get('.z-html')
+            .should('contain.text', 'CONTAINS ANY')
+            .should('contain.text', '[24150]')
+            .should('contain.text', '[]') // Customers: N/A
+            .should('contain.text', '[MGM_Referral_1]')
+            .should('contain.text', '{CRC=12000}');
+
+        cy.get('.z-html')
+            .should('contain.text', '{CRC=8000}');
+
+        // Test Promotion 2
+        cy.get('.z-bandbox-input')
+            .eq(6)
+            .should('exist')
+            .clear()
+            .type('TN_PMI_MGM_Godson_Discount', { force: true })
+            .wait(300);
+
+        cy.get('.yw-textsearch-searchbutton.z-button')
+            .eq(1)
+            .click({ force: true })
+            .wait(10000);
+
+        const promotionCode2 = 'TN_PMI_MGM_Godson_Discount';
+        const promotionName2 = 'Member get member';
+        const websiteEnv2 = 'Tunisia_Promotion_Group';
+        const promotionVersion2 = '19';
+
+        cy.log(`Promotion Code: ${promotionCode2}`);
+        cy.log(`Promotion Name: ${promotionName2}`);
+        cy.log(`Website Environment: ${websiteEnv2}`);
+        cy.log(`Promotion Version: ${promotionVersion2}`);
+
+        function searchPromotion2() {
+            const selector2 = `tr.yw-coll-browser-hyperlink:has(.yw-listview-cell-label.z-label:contains("${promotionCode2}")):has(.yw-listview-cell-label.z-label:contains("${promotionName2}")):has(.yw-listview-cell-label.z-label:contains("${websiteEnv2}")):has(.yw-listview-cell-label.z-label:contains("${promotionVersion2}"))`;
+
+            function checkPage2() {
+                cy.get('body').then($body => {
+                    if ($body.find(selector2).length > 0) {
+                        cy.get(selector2).within(() => {
+                            cy.get(`.yw-listview-cell-label.z-label:contains("${promotionVersion2}")`)
+                                .click({ force: true })
+                                .wait(10000);
+                        });
+                    } else {
+                        cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                            cy.log('Button found:', $button.length > 0 ? 'Yes' : 'No');
+                            cy.log('Button visibility:', $button.is(':visible') ? 'Visible' : 'Not Visible');
+                            cy.log('Button disabled attribute:', $button.attr('disabled') ? 'Disabled' : 'Enabled');
+
+                            if ($button.is(':visible') && !$button.attr('disabled')) {
+                                cy.log('Clicking the next page button');
+                                cy.wrap($button).click({ force: true }).wait(5000);
+                                checkPage2();
+                            } else {
+                                cy.log('Promotion not found or next page button is not clickable');
+                            }
+                        });
+                    }
+                });
+            }
+
+            checkPage2();
+        }
+
+        searchPromotion2();
+
+        cy.get('.z-tab-content')
+            .contains('Rule Properties')
+            .scrollIntoView()
+            .click({ force: true });
+
+        cy.get('.ye-default-reference-editor-selected-item-label.ye-editor-disabled.z-label')
+            .should('contain.text', 'promotion-tn-module(hybris-rules:promotion-tn:1.0.0)');
+
+        cy.get('.yw-editorarea-tablabel.z-label')
+            .contains('Conditions & Actions')
+            .click();
+
+        cy.get('.z-html')
+            .should('contain.text', 'CONTAINS ANY')
+            .should('contain.text', '[MGM_godson_group]')
+            .should('contain.text', '[]') // Customers: N/A
+            .should('contain.text', 'B0000139')
+            .should('contain.text', 'B0000137');
+
+        cy.get('.z-label')
+            .contains('Container')
+            .scrollIntoView()
+            .click({ force: true })
+            .wait(500);
+        cy.get('.z-label')
+            .contains('Qualifying products')
+            .scrollIntoView()
+            .click({ force: true })
+            .wait(500);
+
+        cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+            .contains("Tunisia Product Catalog : Staged");
+
+        cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+            .contains("B0000139")
+            .should('contain', 'Tunisia Product Catalog : Staged');
+
+        cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+            .contains("B0000137")
+            .should('contain', 'Tunisia Product Catalog : Staged');
+    });
+});
