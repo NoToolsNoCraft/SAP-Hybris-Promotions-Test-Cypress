@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promotion Cypress Script Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+        }
+        .promotion-section {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            border-radius: 5px;
+            position: relative;
+        }
+        .remove-promotion-btn {
+            display: block;
+            margin: 10px auto;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .add-promotion-btn {
+            display: block;
+            width: 100%;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .testing-section {
+            border: 1px dashed #999;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .additional-expected-values {
+    margin-top: 10px;
+}
+#item {
+    width: 300px; /* Bigger Item field */
+}
+    </style>
+</head>
+<body>
+
+<h1>Promotion Cypress Script Generator</h1>
+
+<form id="scriptGenerator">
+    <div class="form-group">
+        <label for="environment">Select Environment:</label>
+        <select id="environment">
+            <option value="https://backoffice.stg.iqos.com/backoffice/login.zul">STG</option>
+            <option value="https://backoffice.iqos.com/backoffice/login.zul">PROD</option>
+            <option value="https://backoffice.pp.iqos.com/backoffice/login.zul">PreProd</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="username">Username/Email:</label>
+        <input type="text" id="username" placeholder="Enter your username or email" required>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+    </div>
+
+    <div class="form-group">
+        <label for="role">Select Role:</label>
+        <select id="role">
+            <option value="Promotion Editor">Promotion Editor</option>
+            <option value="Promotion Publisher">Promotion Publisher</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="country">Select Country:</label>
+        <select id="country">
+            <option value="Tunisia">Tunisia</option>
+            <option value="Morocco">Morocco</option>
+            <!-- Add more countries as needed -->
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="catalogEnv">Select Catalog Environment:</label>
+        <select id="catalogEnv">
+            <option value="Staged">Staged</option>
+            <option value="Online">Online</option>
+        </select>
+    </div>
+
+    <div id="promotionSections">
+        <div class="promotion-section" id="promotion1">
+            <h2>Promotion 1</h2>
+            <div class="form-group">
+                <label for="promotionCode1">Promotion Code:</label>
+                <input type="text" id="promotionCode1" placeholder="Enter promotion code" required>
+            </div>
+            <div class="form-group">
+                <label for="promotionName1">Promotion Name:</label>
+                <input type="text" id="promotionName1" placeholder="Enter promotion name" required>
+            </div>
+            <div class="form-group">
+                <label for="websiteEnv1">Website Environment:</label>
+                <input type="text" id="websiteEnv1" placeholder="Enter website environment" required>
+            </div>
+            <div class="form-group">
+                <label for="promotionVersion1">Promotion Version:</label>
+                <input type="text" id="promotionVersion1" placeholder="Enter promotion version" required>
+            </div>
+            <div id="testingSectionsContainer1"></div>
+            <button type="button" onclick="addTestingSection(1)">Add Testing Section</button>
+            <button type="button" class="remove-promotion-btn">Remove Promotion</button>
+        </div>
+    </div>
+
+    <button type="button" class="add-promotion-btn" id="addPromotionBtn">Add Another Promotion</button>
+    <button type="submit">Generate Script</button>
+</form>
+
+<pre id="generatedScript" style="background-color: #fff; padding: 10px; border-radius: 5px; display: none;"></pre>
+
+<script>
+    let promotionCount = 1;
+
+    // Function to add a new Expected Value field
+    function addExpectedValueField(container) {
+        const div = document.createElement('div');
+        div.className = 'item-expected-value';
+        div.innerHTML = `
+            <label>Expected Value: <input type="text" class="expectedValue"></label>
+            <button type="button" class="remove-expected-value-btn" onclick="removeExpectedValueField(this)">X</button>
+        `;
+        container.appendChild(div);
+    }
+
+    // Function to remove an Expected Value field
+    function removeExpectedValueField(button) {
+        button.parentElement.remove();
+    }
+
+    // Add new promotion section
+document.getElementById('addPromotionBtn').addEventListener('click', function() {
+    promotionCount++;
+    const promotionSection = document.createElement('div');
+    promotionSection.className = 'promotion-section';
+    promotionSection.id = 'promotion' + promotionCount;
+    promotionSection.innerHTML = 
+        `<h2>Promotion ${promotionCount}</h2>
+        <div class="form-group">
+            <label for="promotionCode${promotionCount}">Promotion Code:</label>
+            <input type="text" id="promotionCode${promotionCount}" placeholder="Enter promotion code" required>
+        </div>
+        <div class="form-group">
+            <label for="promotionName${promotionCount}">Promotion Name:</label>
+            <input type="text" id="promotionName${promotionCount}" placeholder="Enter promotion name" required>
+        </div>
+        <div class="form-group">
+            <label for="websiteEnv${promotionCount}">Website Environment:</label>
+            <input type="text" id="websiteEnv${promotionCount}" placeholder="Enter website environment" required>
+        </div>
+        <div class="form-group">
+            <label for="promotionVersion${promotionCount}">Promotion Version:</label>
+            <input type="text" id="promotionVersion${promotionCount}" placeholder="Enter promotion version" required>
+        </div>
+        <div id="testingSectionsContainer${promotionCount}"></div>
+        <button type="button" onclick="addTestingSection(${promotionCount})">Add Testing Section</button>
+        <button type="button" class="remove-promotion-btn" onclick="removePromotion(${promotionCount})">Remove Promotion</button>
+    `;
+    document.getElementById('promotionSections').appendChild(promotionSection);
+});
+
+document.getElementById('scriptGenerator').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const environment = document.getElementById('environment').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const role = document.getElementById('role').value;
+    const country = document.getElementById('country').value;
+    const catalogEnv = document.getElementById('catalogEnv').value;
+
+    let script = `Cypress.on('uncaught:exception', (err, runnable) => {
+        return false;
+    });
+
+    describe('Promotions test', () => {
+        const loginPageUrl = '${environment}';
+        const username = '${username}';
+        const password = '${password}';
+        const promotionEditorRole = '${role}';
+        const proceedButtonText = 'PROCEED';
+        const marketingMenuText = 'Marketing';
+        const promotionRulesText = 'Promotion Rules';
+
+        before(() => {
+            // Login process that runs once before all test cases
+            cy.visit(loginPageUrl, { failOnStatusCode: false }).wait(1000);
+            cy.get('input[placeholder="Enter user name"]:visible')
+                .type(username, { force: true }).wait(300);
+            cy.get('input[placeholder="Enter password"]:visible')
+                .type(password, { force: true });
+            cy.get('.login_btn').click({ force: true }).wait(30000);
+            cy.get('.z-listcell-content').contains(promotionEditorRole).should('exist').click({ force: true }).wait(2000);
+            cy.get('.yw-selector-btn').contains(proceedButtonText).should('exist').click({ force: true }).wait(15000);
+
+            // Navigation process
+            cy.get('.yw-navigationNode-level1').contains(marketingMenuText).should('exist').click({ force: true }).wait(3000);
+            cy.get('span.z-label').contains(promotionRulesText).should('exist').click({ force: true }).wait(5000);
+        });
+
+        it('Check all promotions', () => {\n`;
+
+    // Loop through all promotions and generate commands within the same test case
+    for (let i = 1; i <= promotionCount; i++) {
+        const promotionCode = document.getElementById('promotionCode' + i).value;
+        const promotionName = document.getElementById('promotionName' + i).value;
+        const websiteEnv = document.getElementById('websiteEnv' + i).value;
+        const promotionVersion = document.getElementById('promotionVersion' + i).value;
+
+        if (i === 1) {
+            // First promotion: include 'let'
+            script += `
+            // Check Promotion ${i}
+            let promotionCode = '${promotionCode}';
+            let promotionName = '${promotionName}';
+            let websiteEnv = '${websiteEnv}';
+            let promotionVersion = '${promotionVersion}';\n`;
+        } else {
+            // Subsequent promotions: no 'let'
+            script += `
+            // Check Promotion ${i}
+            promotionCode = '${promotionCode}';
+            promotionName = '${promotionName}';
+            websiteEnv = '${websiteEnv}';
+            promotionVersion = '${promotionVersion}';\n`;
+        }
+
+        script += `
+            searchPromotion(promotionCode, promotionName, websiteEnv, promotionVersion);\n`;
+        // Generate commands for each promotion dynamically
+        script += generatedCommands(i);
+    }
+
+    script += `    });
+    });
+
+    // searchPromotion function
+    function searchPromotion(promotionCode, promotionName, websiteEnv, promotionVersion) {
+        cy.get('.z-bandbox-input')
+            .eq(6)
+            .should('exist')
+            .clear()
+            .type(promotionCode, { force: true })
+            .wait(300);
+
+        cy.get('.yw-textsearch-searchbutton.z-button')
+            .eq(1)
+            .click({ force: true })
+            .wait(10000);
+
+        const selector = "tr.yw-coll-browser-hyperlink:has(.yw-listview-cell-label.z-label:contains(\\"" + promotionCode + "\\")):has(.yw-listview-cell-label.z-label:contains(\\"" + promotionName + "\\")):has(.yw-listview-cell-label.z-label:contains(\\"" + websiteEnv + "\\")):has(.yw-listview-cell-label.z-label:contains(\\"" + promotionVersion + "\\"))";
+
+        function checkPage() {
+            cy.get('body').then($body => {
+                if ($body.find(selector).length > 0) {
+                    cy.get(selector).within(() => {
+                        cy.get(".yw-listview-cell-label.z-label:contains(\\"" + promotionVersion + "\\")")
+                            .click({ force: true })
+                            .wait(10000);
+                    });
+                } else {
+                    cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                        if ($button.is(':visible') && !$button.attr('disabled')) {
+                            cy.wrap($button).click({ force: true }).wait(5000);
+                            checkPage();
+                        } else {
+                            cy.log('Promotion not found or next page button is not clickable');
+                        }
+                    });
+                }
+            });
+        }
+
+        checkPage();
+    }\n`;
+
+    // Display the generated script
+    document.getElementById('generatedScript').textContent = script;
+    document.getElementById('generatedScript').style.display = 'block';
+});
+
+
+    function renumberPromotions() {
+    const promotionSections = document.querySelectorAll('.promotion-section');
+    promotionSections.forEach((section, index) => {
+        const newIndex = index + 1;
+        section.id = 'promotion' + newIndex;
+        section.querySelector('h2').textContent = 'Promotion ' + newIndex;
+        section.querySelector('label[for^="promotionCode"]').setAttribute('for', 'promotionCode' + newIndex);
+        section.querySelector('input[id^="promotionCode"]').id = 'promotionCode' + newIndex;
+        section.querySelector('label[for^="promotionName"]').setAttribute('for', 'promotionName' + newIndex);
+        section.querySelector('input[id^="promotionName"]').id = 'promotionName' + newIndex;
+        section.querySelector('label[for^="websiteEnv"]').setAttribute('for', 'websiteEnv' + newIndex);
+        section.querySelector('input[id^="websiteEnv"]').id = 'websiteEnv' + newIndex;
+        section.querySelector('label[for^="promotionVersion"]').setAttribute('for', 'promotionVersion' + newIndex);
+        section.querySelector('input[id^="promotionVersion"]').id = 'promotionVersion' + newIndex;
+    });
+    promotionCount = promotionSections.length;
+}
+
+    // Remove a promotion section
+function removePromotion(index) {
+    document.getElementById('promotion' + index).remove();
+    renumberPromotions();
+}
+
+// Function to remove a testing section
+function removeTestingSection(button) {
+    button.parentElement.remove();
+}
+ // Function to add a new Testing Section
+function addTestingSection(promotionIndex) {
+    const container = document.getElementById(`testingSectionsContainer${promotionIndex}`);
+    const testingSection = document.createElement('div');
+    testingSection.className = 'testing-section';
+
+    testingSection.innerHTML = `
+        <h4>Testing Section</h4>
+        <div class="form-group">
+            <label for="item">Item:</label>
+            <select id="item" class="item-select">
+                <option value="Code">Code</option>
+                <option value="Promotion module">Promotion module</option>
+                <option value="General">General</option>
+                <option value="Products">Products</option>
+            </select>
+        </div>
+        <label>Expected Value: <input type="text" class="expectedValue"></label><br>
+        <button type="button" onclick="removeTestingSection(this)">Remove</button>
+    `;
+
+    container.appendChild(testingSection);
+}
+
+// Function to generate Cypress commands based on user inputs
+function generatedCommands(promotionIndex) {
+    let commands = '';
+    
+    // Iterate over all testing sections within the current promotion section
+    const testingSections = document.querySelectorAll(`#testingSectionsContainer${promotionIndex} .testing-section`);
+    
+    testingSections.forEach(section => {
+        const selectedItem = section.querySelector('.item-select').value;
+        const expectedValue = section.querySelector('.expectedValue').value;
+        const country = document.getElementById('country').value;
+        const catalogEnv = document.getElementById('catalogEnv').value;
+
+        // Map the selected item to the appropriate Cypress command
+        switch (selectedItem) {
+            case 'Promotion module':
+                commands += `
+                    cy.get('.z-tab-content')
+                      .contains('Rule Properties')
+                      .scrollIntoView()
+                      .click({ force: true });
+                    cy.get('.ye-default-reference-editor-selected-item-label.ye-editor-disabled.z-label')
+                      .should('contain.text', '${expectedValue}');
+                `;
+                break;
+
+                case 'Code':
+                commands += `
+                    cy.get('.z-tab-content')
+                      .contains('Rule Properties')
+                      .scrollIntoView()
+                      .click({ force: true });
+                    cy.get('.ye-input-text.ye-com_hybris_cockpitng_editor_defaulttext.z-textbox.z-textbox-readonly')
+                      .should('have.value', '${expectedValue}');
+                `;
+                break;
+            
+            case 'General':
+                commands += `
+                    cy.get('.z-html')
+                        .should('contain.text', '${expectedValue.split(',').join("')\n                        .should('contain.text', '")}')
+                        .should('exist');
+                `;
+                break;
+            
+            case 'Products':
+                commands += `
+                    cy.get('.z-label').contains('Container').scrollIntoView().click({ force: true }).wait(500);
+                    cy.get('.z-label').contains('Qualifying products').scrollIntoView().click({ force: true }).wait(500);
+                    cy.get('.ye-default-reference-editor-selected-item-label.z-label')
+                        .should('contain.text', '${expectedValue.trim()}')
+                        .should('contain', '${country} Product Catalog : ${catalogEnv}');
+                `;
+                break;
+            
+            default:
+                console.error('Unknown item type:', selectedItem);
+        }
+    });
+    
+    return commands;
+}
+
+    
+</script>
+
+</body>
+</html>
