@@ -296,9 +296,9 @@ document.getElementById('scriptGenerator').addEventListener('submit', function(e
             cy.get('body').then($body => {
                 if ($body.find(selector).length > 0) {
                     cy.get(selector).within(() => {
-                        cy.get(".yw-listview-cell-label.z-label:contains(\\"" + promotionVersion + "\\")")
-                            .click({ force: true })
-                            .wait(10000);
+                        cy.get('.yw-listview-cell-label.z-label')
+                          .filter((_, el) => el.innerText.trim() === promotionVersion)
+                          .click({ force: true });
                     });
                 } else {
                     cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
