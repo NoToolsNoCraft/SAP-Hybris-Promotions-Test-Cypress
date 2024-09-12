@@ -1,0 +1,263 @@
+Cypress.on('uncaught:exception', (err, runnable) => {
+        return false;
+    });
+
+    describe('Promotions test', () => {
+        const loginPageUrl = 'https://backoffice.stg.iqos.com/backoffice/login.zul';
+        const username = 'petar.skrbic@contracted.pmi.com';
+        const password = 'stg_498756!';
+        const promotionEditorRole = 'Promotion Editor';
+        const proceedButtonText = 'PROCEED';
+        const marketingMenuText = 'Marketing';
+        const promotionRulesText = 'Promotion Rules';
+
+        before(() => {
+            // STG login
+            cy.visit(loginPageUrl, { failOnStatusCode: false }).wait(1000);
+            cy.get('input[placeholder="Enter user name"]:visible')
+                .type(username, { force: true }).wait(300);
+            cy.get('input[placeholder="Enter password"]:visible')
+                .type(password, { force: true });
+            cy.get('.login_btn').click({ force: true }).wait(30000);
+            cy.get('.z-listcell-content').contains(promotionEditorRole).should('exist').click({ force: true }).wait(2000);
+            cy.get('.yw-selector-btn').contains(proceedButtonText).should('exist').click({ force: true }).wait(15000);
+
+            // Navigation
+            cy.get('.yw-navigationNode-level1').contains(marketingMenuText).should('exist').click({ force: true }).wait(3000);
+            cy.get('span.z-label').contains(promotionRulesText).should('exist').click({ force: true }).wait(5000);
+        
+        });
+
+        it('Check all promotions', () => {
+    
+            // Check Promotion 1
+            let promotionCode = 'UK_ZYN_MULTI_BUY_20';
+            let promotionName = '10 ZYN Cans multi-buy + 10 ZYN Cans multi-buy';
+            let websiteEnv = 'Inactive';
+            let promotionVersion = '2';
+
+            searchPromotion(promotionCode, promotionName, websiteEnv, promotionVersion);
+
+                    cy.get('.z-tab-content')
+                      .contains('Rule Properties')
+                      .scrollIntoView()
+                      .click({ force: true });
+                    cy.get('.ye-input-text.ye-com_hybris_cockpitng_editor_defaulttext.z-textbox[value="If a user purchases any 20 ZYN cans, price per can set to £4.55"]')
+                      .should('have.value', 'If a user purchases any 20 ZYN cans, price per can set to £4.55');
+                
+            //Step 1 - Conditions & Actions tab
+            cy.get('.z-tab-content')
+              .contains('Conditions & Actions')
+              .scrollIntoView()
+              .click({ force: true });
+            
+            // Step 2: Open 'Container' if not already open
+            cy.get('body').then($body => {
+                if ($body.find('.z-label:contains("Container")').length > 0) {
+                    cy.get('.z-label')
+                      .contains('Container')
+                      .scrollIntoView()
+                      .then(($container) => {
+                          if (!$container.hasClass('open')) {
+                              cy.wrap($container).click({ force: true });
+                          }
+                      });
+                } else {
+                    cy.log('Container not found, skipping to the next step.');
+                }
+            });
+
+            // Step 3: Open 'Qualifying products' if not already open
+            cy.get('span.z-label').contains('Qualifying products').then(($label) => {
+                const parent = $label.closest('div.yrb-condition');
+                cy.wrap(parent).find('i').then(($icon) => {
+                    if ($icon.hasClass('z-icon-caret-right')) {
+                        cy.wrap($label).click();
+                    } else if ($icon.hasClass('z-icon-caret-down')) {
+                        cy.log('Qualifying products is already open');
+                    }
+                });
+            });
+
+            // Step 4: Verify the product text in the component for each product code
+            cy.get('span.ye-default-reference-editor-selected-item-label.z-label')
+              .should('contain.text', '[G0001777] - United Kingdom Product Catalog : Staged');
+        
+            //Step 1 - Conditions & Actions tab
+            cy.get('.z-tab-content')
+              .contains('Conditions & Actions')
+              .scrollIntoView()
+              .click({ force: true });
+            
+            // Step 2: Open 'Container' if not already open
+            cy.get('body').then($body => {
+                if ($body.find('.z-label:contains("Container")').length > 0) {
+                    cy.get('.z-label')
+                      .contains('Container')
+                      .scrollIntoView()
+                      .then(($container) => {
+                          if (!$container.hasClass('open')) {
+                              cy.wrap($container).click({ force: true });
+                          }
+                      });
+                } else {
+                    cy.log('Container not found, skipping to the next step.');
+                }
+            });
+
+            // Step 3: Open 'Qualifying products' if not already open
+            cy.get('span.z-label').contains('Qualifying products').then(($label) => {
+                const parent = $label.closest('div.yrb-condition');
+                cy.wrap(parent).find('i').then(($icon) => {
+                    if ($icon.hasClass('z-icon-caret-right')) {
+                        cy.wrap($label).click();
+                    } else if ($icon.hasClass('z-icon-caret-down')) {
+                        cy.log('Qualifying products is already open');
+                    }
+                });
+            });
+
+            // Step 4: Verify the product text in the component for each product code
+            cy.get('span.ye-default-reference-editor-selected-item-label.z-label')
+              .should('contain.text', '[G0001516] - United Kingdom Product Catalog : Staged');
+        
+            //Step 1 - Conditions & Actions tab
+            cy.get('.z-tab-content')
+              .contains('Conditions & Actions')
+              .scrollIntoView()
+              .click({ force: true });
+            
+            // Step 2: Open 'Container' if not already open
+            cy.get('body').then($body => {
+                if ($body.find('.z-label:contains("Container")').length > 0) {
+                    cy.get('.z-label')
+                      .contains('Container')
+                      .scrollIntoView()
+                      .then(($container) => {
+                          if (!$container.hasClass('open')) {
+                              cy.wrap($container).click({ force: true });
+                          }
+                      });
+                } else {
+                    cy.log('Container not found, skipping to the next step.');
+                }
+            });
+
+            // Step 3: Open 'Qualifying products' if not already open
+            cy.get('span.z-label').contains('Qualifying products').then(($label) => {
+                const parent = $label.closest('div.yrb-condition');
+                cy.wrap(parent).find('i').then(($icon) => {
+                    if ($icon.hasClass('z-icon-caret-right')) {
+                        cy.wrap($label).click();
+                    } else if ($icon.hasClass('z-icon-caret-down')) {
+                        cy.log('Qualifying products is already open');
+                    }
+                });
+            });
+
+            // Step 4: Verify the product text in the component for each product code
+            cy.get('span.ye-default-reference-editor-selected-item-label.z-label')
+              .should('contain.text', '[G0001576] - United Kingdom Product Catalog : Staged');
+        
+                    // Initial step - Conditions & Actions tab
+        cy.get('.z-tab-content')
+        .contains('Conditions & Actions')
+        .scrollIntoView()
+        .click({ force: true });
+
+        cy.get('span.z-html')
+        .eq(0)
+        .within(() => {
+            // Check if the desired text is present in the rule
+            cy.contains('Rule with code UK_ZYN_MULTI_BUY_3 execution allowed false')
+              .should('exist');  // Verifies the existence of the text
+          });
+        
+                
+                    // Initial step - Conditions & Actions tab
+        cy.get('.z-tab-content')
+        .contains('Conditions & Actions')
+        .scrollIntoView()
+        .click({ force: true });
+
+        cy.get('span.z-html')
+        .eq(0)
+        .within(() => {
+            // Check if the desired text is present in the rule
+            cy.contains('Rule with code UK_ZYN_MULTI_BUY_5 execution allowed false')
+              .should('exist');  // Verifies the existence of the text
+          });
+        
+                
+                    // Initial step - Conditions & Actions tab
+        cy.get('.z-tab-content')
+        .contains('Conditions & Actions')
+        .scrollIntoView()
+        .click({ force: true });
+
+        cy.get('span.z-html')
+        .eq(0)
+        .within(() => {
+            // Check if the desired text is present in the rule
+            cy.contains('Rule with code UK_ZYN_MULTI_BUY_8 execution allowed false')
+              .should('exist');  // Verifies the existence of the text
+          });
+        
+                    });
+    });
+
+    // searchPromotion function
+    function searchPromotion(promotionCode, promotionName, websiteEnv, promotionVersion) {
+        cy.get('.z-bandbox-input')
+            .eq(6)
+            .should('exist')
+            .clear()
+            .type(promotionCode, { force: true })
+            .wait(300);
+
+        cy.get('.yw-textsearch-searchbutton.z-button')
+            .eq(1)
+            .click({ force: true })
+            .wait(10000);
+
+        // Loop through pages to find the promotion
+    function checkPage() {
+        cy.get('body').then($body => {
+            // Define a more precise selector for the rows containing promotion details
+            cy.get('tr.yw-coll-browser-hyperlink').each(($row) => {
+
+                // Ensure that the row contains all necessary values except for the version first
+                if(
+                    $row.find('.yw-listview-cell-label.z-label:contains("' + promotionCode + '")').length > 0 &&
+                    $row.find('.yw-listview-cell-label.z-label:contains("' + promotionName + '")').length > 0 &&
+                    $row.find('.yw-listview-cell-label.z-label:contains("' + websiteEnv + '")').length > 0) {
+
+                    // Check for the correct version specifically, using each() instead of filter()
+                    cy.wrap($row).within(() => {
+                        cy.get('.yw-listview-cell-label.z-label').each(($el) => {
+                            const versionText = $el.text().trim();
+                            const className = $el.attr('class'); // Get the class name of the element
+                            
+                            // Ensure the class and the version both match exactly
+                            if (className.includes('z-label') && versionText === promotionVersion) {
+                                cy.wrap($el).click({ force: true }); // Click only if it matches the correct version
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Handle pagination if necessary
+            cy.get('button.z-paging-button.z-paging-next[title="Next Page"]').eq(2).then($button => {
+                if ($button.is(':visible') && !$button.attr('disabled')) {
+                    cy.wrap($button).click({ force: true }).wait(5000);
+                    checkPage(); // Recursively check the next page
+                } else {
+                    cy.log('Promotion not found or next page button is not clickable');
+                }
+            });
+        });
+    }
+    
+    checkPage();
+    }
