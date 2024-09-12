@@ -4,8 +4,8 @@ Cypress.on('uncaught:exception', (err, runnable) => {
 
     describe('Promotions test', () => {
         const loginPageUrl = 'https://backoffice.stg.iqos.com/backoffice/login.zul';
-        const username = 'petar.skrbic@contracted.pmi.com';
-        const password = 'stg_498756!';
+        const username = 'YOUR USERNAME HERE';
+        const password = 'YOUR PASSWORD HERE';
         const promotionEditorRole = 'Promotion Editor';
         const proceedButtonText = 'PROCEED';
         const marketingMenuText = 'Marketing';
